@@ -6,7 +6,7 @@ const { getAddress } = require('./Address')
 const rs = require('jsrsasign')
 const { uncompress } = require('./Utils')
 
-const COIN_TYPE_ELA = 0
+const COIN_TYPE_ELA = 2305
 const COIN_TYPE_IDCHAIN = 1
 
 const EXTERNAL_CHAIN = 0
@@ -14,7 +14,7 @@ const INTERNAL_CHAIN = 1
 
 const ELA_ASSERT_ID = 'a3d0eaa466df74983b5d7c543de6904f4c9418ead5ffd6d25814234a96db37b0'
 
-const getMasterPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
+const getRootPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
     const prvKey = HDPrivateKey.fromSeed(seed)
     return prvKey.xprivkey
 }
@@ -100,7 +100,7 @@ const verify = (data, signature, pubKey, hex = false) => {
 
 module.exports = {
     getMasterPublicKey,
-    getMasterPrivateKey,
+    getRootPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,
     getPublicKeyFromPrivateKey,
