@@ -3,6 +3,7 @@ const { getMultiSignAddress, getAddressFromPrivateKey, getAddress, getDid, getMu
 const Transaction = require('../src/Transaction')
 const {
     getMasterPublicKey,
+    getMasterPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,
     generateSubPrivateKey,
@@ -43,8 +44,11 @@ describe('getMasterPublicKey', function() {
             'de7bc75b0c29b1f543d9ef884acc508a3daef9844ce3c69c450b2e10748276b99203e682ea806189b1f08d25be93e1728b98493574e16f35f38e30a68382d463'
         const masterPublicKey =
             'xpub6D9hB6pdNw9VcM1vpR1Qz1ZNuxjmfK8mYnr87XkpBB87YRKTpbYMfyjEEsCCc6t8n2Yz2vQZdQk3tiyfbB3Hc2H2NgwMub96VKpJDVbj9CL'
+        const masterPrivatekey =
+            'xprv9s21ZrQH143K3nPiok1iPEYbVYLwgE8kZjCjHTYfacgXB6Y294UKZZSmR4X9CQcJrN5JakBZXUPDtRb55E2CbRpdGyR5BG9s5HBCZZqMUzF'
 
         expect(getMasterPublicKey(seed)).toBe(masterPublicKey)
+        expect(getMasterPrivateKey(seed)).toBe(masterPrivatekey)
     })
 })
 
@@ -261,5 +265,30 @@ describe('verifyTransaction', function() {
         var signedData = tx.Programs[0].parameter.slice(1).toString('hex')
         var publicKey = tx.Programs[0].code.slice(1,34).toString('hex')
         expect(verify(message, signedData, publicKey, hex = true)).toBe(true)
+    })
+})
+
+describe('Trust Wallet Core tests', function() {
+    it('should derive from mnemonic', function() {
+        const wordlist = 'shoot island position soft burden budget tooth cruel issue economy destroy above'
+        const seed = '577cd910aede2582668a741d476b45e7998e905a4286f701b87b25923501f9d4ea19513b460bcccbc069ebbe4327a59af3d6463045c4b6fa21a5e7004ccfcc3e'
+
+        expect(getSeedFromMnemonic(wordlist).toString('hex')).toBe(seed)
+
+        expect(getMasterPublicKey(seed)).toBe("xpub6CacnBtimfgHnYgYiWFBnV3HEyjfFUMZCB7xWJ3tjEt2mCmVf9XpjxFbExSHYUhbeTuBQgDT2uNNXJHFzDhCCzrQEdRcH5TGxEPQ7D4CcVq")
+        expect(getMasterPrivateKey(seed)).toBe("xprv9s21ZrQH143K4bnrDwqpp9EwmpZPbQBLJefqcUkHG1Eb6gRzsrtuytGvNpzpuT8Prs3ubDPpp3EodHtdHvZCHuQCYPwDGvuHntB8qXPhiT1")
+
+        const pubKey = getSinglePublicKey(seed).toString('hex')
+        expect(getAddress(pubKey)).toBe("EMhz3DQtQBYaQPzAps6MziyQZqhE8MjeTR")
+
+        // m/44'/0'/0'/0/0
+        const pubKey0 = generateSubPublicKey(getMasterPublicKey(seed), coinType = 0, index = 0).toString('hex')
+        expect(pubKey0).toBe("024bd8342acbfac4582705e93b573f5c01de16425b7f42f3d9f8892cefe32fa7af")
+        expect(getAddress(pubKey0)).toBe("EMhz3DQtQBYaQPzAps6MziyQZqhE8MjeTR")
+
+        // m/44'/0'/0'/0/1
+        const pubKey1 = generateSubPublicKey(getMasterPublicKey(seed), coinType = 0, index = 1).toString('hex')
+        expect(pubKey1).toBe("03727fcd32667f547ec38d14b786f33cdfe48eb98b6dcb32d24bff7fe8eb51b366")
+        expect(getAddress(pubKey1)).toBe("EHstsF3LdM4hqF47ehZ14uRrnwgVi6uVMC")
     })
 })

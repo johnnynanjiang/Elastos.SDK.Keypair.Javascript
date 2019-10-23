@@ -14,6 +14,11 @@ const INTERNAL_CHAIN = 1
 
 const ELA_ASSERT_ID = 'a3d0eaa466df74983b5d7c543de6904f4c9418ead5ffd6d25814234a96db37b0'
 
+const getMasterPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
+    const prvKey = HDPrivateKey.fromSeed(seed)
+    return prvKey.xprivkey
+}
+
 const getMasterPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
     const prvKey = HDPrivateKey.fromSeed(seed)
     const parent = new HDPrivateKey(prvKey.xprivkey)
@@ -95,6 +100,7 @@ const verify = (data, signature, pubKey, hex = false) => {
 
 module.exports = {
     getMasterPublicKey,
+    getMasterPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,
     getPublicKeyFromPrivateKey,
