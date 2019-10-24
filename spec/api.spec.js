@@ -280,15 +280,13 @@ describe('Trust Wallet Core tests', function() {
         expect(getRootPrivateKey(seed)).toBe("xprv9s21ZrQH143K4bnrDwqpp9EwmpZPbQBLJefqcUkHG1Eb6gRzsrtuytGvNpzpuT8Prs3ubDPpp3EodHtdHvZCHuQCYPwDGvuHntB8qXPhiT1")
 
         // Account Extended Public Key in iancoleman.io/bip39/
+        // m/44'/2305'/0'
         expect(getMasterPrivateKey(seed)).toBe("xprv9xz3iq3SDdk95hArvZuN89Qct6u5UNLGB3brATjPjPPhAcbDxf6vZuwASfZmyiUuBj8ZNxagaR6tUFauAoNusLQ6xkrfbeUxXbJdnmCNsMg")
         expect(getMasterPublicKey(seed)).toBe("xpub6ByQ8LaL41JSJBFL2bSNVHMMS8jZsq47YGXSxr91Hivg3QvNWCRB7iFeHy3na3y74dWPb7LhBCstHMMffqB3yxVQmxCsfFP24wc9fyAhfsy")
 
-        const pubKey = getSinglePublicKey(seed).toString('hex')
-        expect(getAddress(pubKey)).toBe("EUHxgBacbyGNneLyZQPwp7hoHxWvCJYQqy")
-
         // m/44'/2305'/0'/0/0
-        const pubKey0 = generateSubPublicKey(getMasterPublicKey(seed), coinType = 2305, index = 0).toString('hex')
-        expect(pubKey0).toBe("02b1fcee311767c568f663e5165e878df7e8ff03f875786da08526c06ae9b23edd")
-        expect(getAddress(pubKey0)).toBe("EKCDvY6ZgL9myBP3QmcdStBq4NEjz5r7Gk")
+        const pubKey0 = generateSubPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
+        expect(pubKey0).toBe("0264ef40c21f18f7539f1d0926663392f9e18dee56046244c24d3b4ea6780a86e8")
+        expect(getAddress(pubKey0)).toBe("EUHxgBacbyGNneLyZQPwp7hoHxWvCJYQqy")
     })
 })
