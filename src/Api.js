@@ -19,7 +19,7 @@ const getRootPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
     return prvKey.xprivkey
 }
 
-const getMasterPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
+const getBaseMultiWallet = (seed, coinType = COIN_TYPE_ELA) => {
     const prvKey = HDPrivateKey.fromSeed(seed)
     const parent = new HDPrivateKey(prvKey.xprivkey)
 
@@ -28,7 +28,15 @@ const getMasterPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
         .deriveChild(coinType, true)
         .deriveChild(0, true)
 
-    return multiWallet.xpubkey
+    return multiWallet
+}
+
+const getMasterPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
+    return getBaseMultiWallet(seed, coinType).xprivkey
+}
+
+const getMasterPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
+    return getBaseMultiWallet(seed, coinType).xpubkey
 }
 
 const getIdChainMasterPublicKey = seed => {
@@ -99,6 +107,7 @@ const verify = (data, signature, pubKey, hex = false) => {
 }
 
 module.exports = {
+    getMasterPrivateKey,
     getMasterPublicKey,
     getRootPrivateKey,
     getSinglePrivateKey,

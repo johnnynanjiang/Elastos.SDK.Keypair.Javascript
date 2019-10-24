@@ -2,6 +2,7 @@ const { getSeedFromMnemonic } = require('../src/Mnemonic')
 const { getMultiSignAddress, getAddressFromPrivateKey, getAddress, getDid, getMultiSign } = require('../src/Address')
 const Transaction = require('../src/Transaction')
 const {
+    getMasterPrivateKey,
     getMasterPublicKey,
     getRootPrivateKey,
     getSinglePrivateKey,
@@ -275,10 +276,11 @@ describe('Trust Wallet Core tests', function() {
 
         expect(getSeedFromMnemonic(wordlist).toString('hex')).toBe(seed)
 
-        // BIP32 Root Key
+        // BIP32 Root Key in iancoleman.io/bip39/
         expect(getRootPrivateKey(seed)).toBe("xprv9s21ZrQH143K4bnrDwqpp9EwmpZPbQBLJefqcUkHG1Eb6gRzsrtuytGvNpzpuT8Prs3ubDPpp3EodHtdHvZCHuQCYPwDGvuHntB8qXPhiT1")
 
-        // Account Extended Public Key
+        // Account Extended Public Key in iancoleman.io/bip39/
+        expect(getMasterPrivateKey(seed)).toBe("xprv9xz3iq3SDdk95hArvZuN89Qct6u5UNLGB3brATjPjPPhAcbDxf6vZuwASfZmyiUuBj8ZNxagaR6tUFauAoNusLQ6xkrfbeUxXbJdnmCNsMg")
         expect(getMasterPublicKey(seed)).toBe("xpub6ByQ8LaL41JSJBFL2bSNVHMMS8jZsq47YGXSxr91Hivg3QvNWCRB7iFeHy3na3y74dWPb7LhBCstHMMffqB3yxVQmxCsfFP24wc9fyAhfsy")
 
         const pubKey = getSinglePublicKey(seed).toString('hex')
