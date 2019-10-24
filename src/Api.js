@@ -1,10 +1,10 @@
-const { HDPrivateKey, HDPublicKey, PublicKey, PrivateKey, crypto } = require('bitcore-lib-p256')
-const { Buffer } = require('buffer')
-const { ecdsa, hash } = crypto
-const { getSeedFromMnemonic } = require('./Mnemonic')
-const { getAddress } = require('./Address')
+const {HDPrivateKey, HDPublicKey, PublicKey, PrivateKey, crypto} = require('bitcore-lib-p256')
+const {Buffer} = require('buffer')
+const {ecdsa, hash} = crypto
+const {getSeedFromMnemonic} = require('./Mnemonic')
+const {getAddress} = require('./Address')
 const rs = require('jsrsasign')
-const { uncompress } = require('./Utils')
+const {uncompress} = require('./Utils')
 
 const COIN_TYPE_ELA = 2305
 const COIN_TYPE_IDCHAIN = 1
@@ -19,7 +19,7 @@ const getRootPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
     return prvKey.xprivkey
 }
 
-const getBaseMultiWallet = (seed, coinType = COIN_TYPE_ELA) => {
+const getRootMultiWallet = (seed, coinType = COIN_TYPE_ELA) => {
     const prvKey = HDPrivateKey.fromSeed(seed)
     const parent = new HDPrivateKey(prvKey.xprivkey)
 
@@ -32,11 +32,32 @@ const getBaseMultiWallet = (seed, coinType = COIN_TYPE_ELA) => {
 }
 
 const getMasterPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
-    return getBaseMultiWallet(seed, coinType).xprivkey
+    return getRootMultiWallet(seed, coinType).xprivkey
 }
 
 const getMasterPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
-    return getBaseMultiWallet(seed, coinType).xpubkey
+    return getRootMultiWallet(seed, coinType).xpubkey
+}
+
+const getBip32RootMultiWallet = (seed, coinType = COIN_TYPE_ELA) => {
+    const prvKey = HDPrivateKey.fromSeed(seed)
+    const parent = new HDPrivateKey(prvKey.xprivkey)
+
+    const multiWallet = parent
+        .deriveChild(44, true)
+        .deriveChild(coinType, true)
+        .deriveChild(0, true)
+        .deriveChild(0, false)
+
+    return multiWallet
+}
+
+const getBip32ExtendedPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
+    return getBip32RootMultiWallet(seed, coinType).xprivkey
+}
+
+const getBip32ExtendedPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
+    return getBip32RootMultiWallet(seed, coinType).xpubkey
 }
 
 const getIdChainMasterPublicKey = seed => {
@@ -88,8 +109,8 @@ const generateSubPublicKey = (masterPublicKey, changeChain, index) => {
 
 const sign = (data, prvKey, hex = false) => {
     if (!hex) data = Buffer.from(data, 'utf8').toString('hex')
-    var signer = new rs.KJUR.crypto.Signature({ alg: 'SHA256withECDSA' })
-    signer.init({ d: prvKey, curve: 'secp256r1' })
+    var signer = new rs.KJUR.crypto.Signature({alg: 'SHA256withECDSA'})
+    signer.init({d: prvKey, curve: 'secp256r1'})
     signer.updateHex(data)
     var signature = signer.sign()
     return rs.ECDSA.asn1SigToConcatSig(signature) // return a hex string
@@ -99,8 +120,8 @@ const verify = (data, signature, pubKey, hex = false) => {
     if (!hex) data = Buffer.from(data, 'utf8').toString('hex')
     const pubKeyObj = PublicKey.fromString(pubKey)
 
-    const signer = new rs.KJUR.crypto.Signature({ alg: 'SHA256withECDSA' })
-    signer.init({ xy: uncompress(pubKeyObj).toString('hex'), curve: 'secp256r1' })
+    const signer = new rs.KJUR.crypto.Signature({alg: 'SHA256withECDSA'})
+    signer.init({xy: uncompress(pubKeyObj).toString('hex'), curve: 'secp256r1'})
     signer.updateHex(data)
 
     return signer.verify(rs.ECDSA.concatSigToASN1Sig(signature))
@@ -109,6 +130,8 @@ const verify = (data, signature, pubKey, hex = false) => {
 module.exports = {
     getMasterPrivateKey,
     getMasterPublicKey,
+    getBip32ExtendedPrivateKey,
+    getBip32ExtendedPublicKey,
     getRootPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,
