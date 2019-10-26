@@ -2,3 +2,6 @@ node_modules
 docs/_build
 package-lock.json
 .idea
+.DS_Store
+elastos-wallet-js-1.0.9.js
+elastos-wallet-js-1.0.9.min.js
