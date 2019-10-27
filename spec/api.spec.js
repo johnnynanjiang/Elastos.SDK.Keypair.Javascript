@@ -2,7 +2,15 @@ const { getSeedFromMnemonic } = require('../src/Mnemonic')
 const { getMultiSignAddress, getAddressFromPrivateKey, getAddress, getDid, getMultiSign } = require('../src/Address')
 const Transaction = require('../src/Transaction')
 const {
+    getMasterPrivateKey,
     getMasterPublicKey,
+    getBip32ExtendedPrivateKey,
+    getBip32ExtendedPublicKey,
+    getAccountExtendedPrivateKey,
+    getAccountExtendedPublicKey,
+    getDerivedPrivateKey,
+    getDerivedPublicKey,
+    getRootPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,
     generateSubPrivateKey,
@@ -45,6 +53,46 @@ describe('getMasterPublicKey', function() {
             'xpub6D9hB6pdNw9VcM1vpR1Qz1ZNuxjmfK8mYnr87XkpBB87YRKTpbYMfyjEEsCCc6t8n2Yz2vQZdQk3tiyfbB3Hc2H2NgwMub96VKpJDVbj9CL'
 
         expect(getMasterPublicKey(seed)).toBe(masterPublicKey)
+
+        // m/44'/0'/0'
+        expect(getAccountExtendedPrivateKey(seed, 0, 0)).toBe("xprv9zALmbHjYZbCPrwTiPUQcsceMvuHFrQvBZvXK9MCcqb8fczKH4E78BQkPZ7DG1YcrCz4qDHLUg5EirFwwDH262zHq5zJMcm3JVbMofPyhGE")
+        expect(getAccountExtendedPublicKey(seed, 0, 0)).toBe("xpub6D9hB6pdNw9VcM1vpR1Qz1ZNuxjmfK8mYnr87XkpBB87YRKTpbYMfyjEEsCCc6t8n2Yz2vQZdQk3tiyfbB3Hc2H2NgwMub96VKpJDVbj9CL")
+
+        // m/44'/0'/0'/0
+        expect(getBip32ExtendedPrivateKey(seed, 0, 0, 0)).toBe("xprvA2QtJEdY15cNiduC2RVhSKrhLRJiDBWhZdgAjdXiwZcyT9BCfRrCdiSpAANLpeigwbZfi3m8Puac3bR5A9kwxcRUj8fqC2RU3yp2JqbhqW8")
+        expect(getBip32ExtendedPublicKey(seed, 0, 0, 0)).toBe("xpub6FQEhkARqTAfw7yf8T2hoToRtT9CceEYvrbmY1wLVu9xKwWMCyATBWmJ1RgPLEe8bm7SAuC3m6twtwEdvMzzG4RHsKj42Pf8V81s33ubgA3")
+
+        // m/44'/0'/0'/0/0
+        var prvKey0 = getDerivedPrivateKey(seed, coinType = 0, account = 0, changeChain = 0, index = 0).toString('hex')
+        var pubKey0 = getDerivedPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
+
+        expect(prvKey0).toBe("1a25bf0687b7734ac943755b35fcc0339d26a89bfb68d93461194a72040441c6")
+        expect(pubKey0).toBe("03167e98a7cb23cc84a86b93dbdac56a264e938dde2cfbcb2b9ee1895b5ffbe57d")
+        expect(getAddress(pubKey0)).toBe("EMSAMkHMTfridY9ftkXn781RSFc37xydXK")
+
+        // m/44'/0'/1'/0/0
+        var prvKey0 = getDerivedPrivateKey(seed, coinType = 0, account = 1, changeChain = 0, index = 0).toString('hex')
+        var pubKey0 = getDerivedPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
+
+        expect(prvKey0).toBe("077cc12ffaedb74e20faf78543192870cc575eceb1f864f4ebad516e6599a631")
+        expect(pubKey0).toBe("03167e98a7cb23cc84a86b93dbdac56a264e938dde2cfbcb2b9ee1895b5ffbe57d")
+        expect(getAddress(pubKey0)).toBe("EMSAMkHMTfridY9ftkXn781RSFc37xydXK")
+
+        // m/44'/0'/0'/0/1
+        var prvKey1 = getDerivedPrivateKey(seed, coinType = 0, account = 0, changeChain = 0, index = 1).toString('hex')
+        var pubKey1 = getDerivedPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 1).toString('hex')
+
+        expect(prvKey1).toBe("7c2e177fcdb1131fe85fc597e6116e0e0c7b0f2ed299d991946c935df567fe34")
+        expect(pubKey1).toBe("03d66e965ae63c1cc79981e9775dfeb78c9b17abde05d0c73397eeb5b04729bfac")
+        expect(getAddress(pubKey1)).toBe("EQjamGkeG76zMMEUzERha6J2Wtz8UXLr8j")
+
+        // m/44'/0'/1'/0/1
+        var prvKey1 = getDerivedPrivateKey(seed, coinType = 0, account = 1, changeChain = 0, index = 1).toString('hex')
+        var pubKey1 = getDerivedPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 1).toString('hex')
+
+        expect(prvKey1).toBe("fc211f6946e9d9dad811d4ba36c483b7d6ff9d2b50dd8858440dd50a3d428810")
+        expect(pubKey1).toBe("03d66e965ae63c1cc79981e9775dfeb78c9b17abde05d0c73397eeb5b04729bfac")
+        expect(getAddress(pubKey1)).toBe("EQjamGkeG76zMMEUzERha6J2Wtz8UXLr8j")
     })
 })
 
@@ -146,6 +194,11 @@ describe('generateSubPrivateKey & generateSubPublicKey', function() {
         vectors.forEach(({ prvKey, pubKey, address }, i) => {
             expect(generateSubPrivateKey(seed, coinType = undefined, changeChain = undefined, index = i).toString('hex')).toBe(prvKey)
             expect(generateSubPublicKey(getMasterPublicKey(seed), coinType = undefined, index = i).toString('hex')).toBe(pubKey)
+        })
+
+        vectors.forEach(({ prvKey, pubKey, address }, i) => {
+            expect(getDerivedPrivateKey(seed, coinType = undefined, account = undefined, changeChain = undefined, index = i).toString('hex')).toBe(prvKey)
+            expect(getDerivedPublicKey(getMasterPublicKey(seed), coinType = undefined, index = i).toString('hex')).toBe(pubKey)
         })
     })
 })
