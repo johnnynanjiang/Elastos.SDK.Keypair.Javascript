@@ -4,6 +4,8 @@ const { getMultiSignAddress, getAddress, getDid } = require('./src/Address')
 const {
     getMasterPrivateKey,
     getMasterPublicKey,
+    getBip32ExtendedPrivateKey,
+    getBip32ExtendedPublicKey,
     getSinglePrivateKey,
     getSinglePublicKey,
     getPublicKeyFromPrivateKey,
@@ -24,6 +26,8 @@ module.exports = {
     getDid,
     getMasterPrivateKey,
     getMasterPublicKey,
+    getBip32ExtendedPrivateKey,
+    getBip32ExtendedPublicKey,
     getSinglePrivateKey,
     getSinglePublicKey,
     getPublicKeyFromPrivateKey,

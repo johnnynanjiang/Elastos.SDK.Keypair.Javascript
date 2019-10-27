@@ -46,6 +46,7 @@ describe('Trust Wallet Core tests', function() {
         //const prvKey0InBase58 = Base58.encode(prvKey0InBinary)
         const pubKey0 = generateSubPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
 
+        expect(prvKey0InBinary.toString('hex')).toBe("1ff3aa928d167e5f484b2f7a46a0ed1cca7d45bb84ddde8ece1045354ed8fb3c")
         //expect(prvKey0InBase58).toBe("cQMwPtHBo1TqGX5hZDmKitbuKoA1R87WA97jy4TnEU8xh1hmwpLn")
         expect(pubKey0).toBe("0264ef40c21f18f7539f1d0926663392f9e18dee56046244c24d3b4ea6780a86e8")
         expect(getAddress(pubKey0)).toBe("EUHxgBacbyGNneLyZQPwp7hoHxWvCJYQqy")
