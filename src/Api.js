@@ -39,25 +39,45 @@ const getMasterPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
     return getRootMultiWallet(seed, coinType).xpubkey
 }
 
-const getBip32RootMultiWallet = (seed, coinType = COIN_TYPE_ELA) => {
+const getAccountExtendedPrivateKey = (seed, coinType = COIN_TYPE_ELA, account = 0) => {
+    return getAccountExtendedMultiWallet(seed, coinType, account).xprivkey
+}
+
+const getAccountExtendedPublicKey = (seed, coinType = COIN_TYPE_ELA, account = 0) => {
+    return getAccountExtendedMultiWallet(seed, coinType, account).xpubkey
+}
+
+const getAccountExtendedMultiWallet = (seed, coinType = COIN_TYPE_ELA, account = 0) => {
     const prvKey = HDPrivateKey.fromSeed(seed)
     const parent = new HDPrivateKey(prvKey.xprivkey)
 
     const multiWallet = parent
         .deriveChild(44, true)
         .deriveChild(coinType, true)
-        .deriveChild(0, true)
-        .deriveChild(0, false)
+        .deriveChild(account, true)
 
     return multiWallet
 }
 
-const getBip32ExtendedPrivateKey = (seed, coinType = COIN_TYPE_ELA) => {
-    return getBip32RootMultiWallet(seed, coinType).xprivkey
+const getBip32RootMultiWallet = (seed, coinType = COIN_TYPE_ELA, account = 0, changeChain = 0) => {
+    const prvKey = HDPrivateKey.fromSeed(seed)
+    const parent = new HDPrivateKey(prvKey.xprivkey)
+
+    const multiWallet = parent
+        .deriveChild(44, true)
+        .deriveChild(coinType, true)
+        .deriveChild(account, true)
+        .deriveChild(changeChain, false)
+
+    return multiWallet
 }
 
-const getBip32ExtendedPublicKey = (seed, coinType = COIN_TYPE_ELA) => {
-    return getBip32RootMultiWallet(seed, coinType).xpubkey
+const getBip32ExtendedPrivateKey = (seed, coinType = COIN_TYPE_ELA, account = 0, changeChain = 0) => {
+    return getBip32RootMultiWallet(seed, coinType, account, changeChain).xprivkey
+}
+
+const getBip32ExtendedPublicKey = (seed, coinType = COIN_TYPE_ELA, account = 0, changeChain = 0) => {
+    return getBip32RootMultiWallet(seed, coinType, account, changeChain).xpubkey
 }
 
 const getIdChainMasterPublicKey = seed => {
@@ -83,15 +103,15 @@ const getDidWallet = (seed, index) => {
 const generateIdChainSubPrivateKey = (seed, index) => getDidWallet(seed, index).privateKey
 const generateIdChainSubPublicKey = (masterPublicKey, index) => getDidWallet(seed, index).publicKey
 
-const getSingleWallet = seed => getMultiWallet(seed, COIN_TYPE_ELA, EXTERNAL_CHAIN, 0)
+const getSingleWallet = seed => getMultiWallet(seed, COIN_TYPE_ELA, 0, EXTERNAL_CHAIN, 0)
 
-const getMultiWallet = (seed, coinType, changeChain, index) => {
+const getMultiWallet = (seed, coinType, account, changeChain, index) => {
     const prvKey = HDPrivateKey.fromSeed(seed)
     const parent = new HDPrivateKey(prvKey.xprivkey)
     return parent
         .deriveChild(44, true)
         .deriveChild(coinType ? coinType : COIN_TYPE_ELA, true)
-        .deriveChild(0, true)
+        .deriveChild(account, true)
         .deriveChild(changeChain ? changeChain : EXTERNAL_CHAIN, false)
         .deriveChild(index ? index : 0, false)
 }
@@ -100,9 +120,18 @@ const getSinglePrivateKey = seed => getSingleWallet(seed).privateKey
 const getSinglePublicKey = seed => getSingleWallet(seed).publicKey
 const getPublicKeyFromPrivateKey = prvKey => PrivateKey.fromBuffer(prvKey).publicKey
 const generateSubPrivateKey = (seed, coinType, changeChain, index) => {
-    return getMultiWallet(seed, coinType, changeChain, index).privateKey
+    return getMultiWallet(seed, coinType, 0, changeChain, index).privateKey
 }
 const generateSubPublicKey = (masterPublicKey, changeChain, index) => {
+    const parent = new HDPublicKey(masterPublicKey)
+    return parent.deriveChild(changeChain ? changeChain : EXTERNAL_CHAIN).deriveChild(index).publicKey
+}
+
+const getDerivedPrivateKey = (seed, coinType, account, changeChain, index) => {
+    return getMultiWallet(seed, coinType, account, changeChain, index).privateKey
+}
+
+const getDerivedPublicKey = (masterPublicKey, changeChain, index) => {
     const parent = new HDPublicKey(masterPublicKey)
     return parent.deriveChild(changeChain ? changeChain : EXTERNAL_CHAIN).deriveChild(index).publicKey
 }
@@ -132,6 +161,10 @@ module.exports = {
     getMasterPublicKey,
     getBip32ExtendedPrivateKey,
     getBip32ExtendedPublicKey,
+    getAccountExtendedPrivateKey,
+    getAccountExtendedPublicKey,
+    getDerivedPrivateKey,
+    getDerivedPublicKey,
     getRootPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,

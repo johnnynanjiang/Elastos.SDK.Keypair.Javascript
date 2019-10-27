@@ -8,6 +8,10 @@ const {
     getMasterPublicKey,
     getBip32ExtendedPrivateKey,
     getBip32ExtendedPublicKey,
+    getAccountExtendedPrivateKey,
+    getAccountExtendedPublicKey,
+    getDerivedPrivateKey,
+    getDerivedPublicKey,
     getRootPrivateKey,
     getSinglePrivateKey,
     getSinglePublicKey,
@@ -36,18 +40,26 @@ describe('Trust Wallet Core tests', function() {
         expect(getMasterPrivateKey(seed)).toBe("xprv9xz3iq3SDdk95hArvZuN89Qct6u5UNLGB3brATjPjPPhAcbDxf6vZuwASfZmyiUuBj8ZNxagaR6tUFauAoNusLQ6xkrfbeUxXbJdnmCNsMg")
         expect(getMasterPublicKey(seed)).toBe("xpub6ByQ8LaL41JSJBFL2bSNVHMMS8jZsq47YGXSxr91Hivg3QvNWCRB7iFeHy3na3y74dWPb7LhBCstHMMffqB3yxVQmxCsfFP24wc9fyAhfsy")
 
+        expect(getAccountExtendedPrivateKey(seed, 2305, 0)).toBe("xprv9xz3iq3SDdk95hArvZuN89Qct6u5UNLGB3brATjPjPPhAcbDxf6vZuwASfZmyiUuBj8ZNxagaR6tUFauAoNusLQ6xkrfbeUxXbJdnmCNsMg")
+        expect(getAccountExtendedPublicKey(seed, 2305, 0)).toBe("xpub6ByQ8LaL41JSJBFL2bSNVHMMS8jZsq47YGXSxr91Hivg3QvNWCRB7iFeHy3na3y74dWPb7LhBCstHMMffqB3yxVQmxCsfFP24wc9fyAhfsy")
+
         // BIP32 Extended Private Key in iancoleman.io/bip39/
         // m/44'/2305'/0'/0
-        expect(getBip32ExtendedPrivateKey(seed)).toBe("xprvA1sQLKGMBuxSGs4NjFqZZ53fVKUV7DPpWKnV7ZR8j1QzxZxq2rmwyfFyGUx5f3r4vh2EhTy6wxUcuxf5GV1otpaLsXkhJttFi6PrTan5WJX")
-        expect(getBip32ExtendedPublicKey(seed)).toBe("xpub6ErkjpoF2HWjVM8qqHNZvCzQ3MJyWg7fsYi5uwpkHLwyqNHyaQ6CXTaT7kh4zkFP4u2o47K7G84uYYrDoxctMfPiAUo9nwjkeKMmM2YYnje")
+        expect(getBip32ExtendedPrivateKey(seed, 2305, 0, 0)).toBe("xprvA1sQLKGMBuxSGs4NjFqZZ53fVKUV7DPpWKnV7ZR8j1QzxZxq2rmwyfFyGUx5f3r4vh2EhTy6wxUcuxf5GV1otpaLsXkhJttFi6PrTan5WJX")
+        expect(getBip32ExtendedPublicKey(seed, 2305, 0, 0)).toBe("xpub6ErkjpoF2HWjVM8qqHNZvCzQ3MJyWg7fsYi5uwpkHLwyqNHyaQ6CXTaT7kh4zkFP4u2o47K7G84uYYrDoxctMfPiAUo9nwjkeKMmM2YYnje")
 
         // m/44'/2305'/0'/0/0
-        const prvKey0InBinary = generateSubPrivateKey(seed, coinType = 2305, changeChain = 0, index = 0)
-        //const prvKey0InBase58 = Base58.encode(prvKey0InBinary)
-        const pubKey0 = generateSubPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
+        var prvKey0 = generateSubPrivateKey(seed, coinType = 2305, changeChain = 0, index = 0).toString('hex')
+        var pubKey0 = generateSubPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
 
-        expect(prvKey0InBinary.toString('hex')).toBe("1ff3aa928d167e5f484b2f7a46a0ed1cca7d45bb84ddde8ece1045354ed8fb3c")
-        //expect(prvKey0InBase58).toBe("cQMwPtHBo1TqGX5hZDmKitbuKoA1R87WA97jy4TnEU8xh1hmwpLn")
+        expect(prvKey0).toBe("1ff3aa928d167e5f484b2f7a46a0ed1cca7d45bb84ddde8ece1045354ed8fb3c")
+        expect(pubKey0).toBe("0264ef40c21f18f7539f1d0926663392f9e18dee56046244c24d3b4ea6780a86e8")
+        expect(getAddress(pubKey0)).toBe("EUHxgBacbyGNneLyZQPwp7hoHxWvCJYQqy")
+
+        prvKey0 = getDerivedPrivateKey(seed, coinType = 2305, account = 0, changeChain = 0, index = 0).toString('hex')
+        pubKey0 = getDerivedPublicKey(getMasterPublicKey(seed), changeChain = 0, index = 0).toString('hex')
+
+        expect(prvKey0).toBe("1ff3aa928d167e5f484b2f7a46a0ed1cca7d45bb84ddde8ece1045354ed8fb3c")
         expect(pubKey0).toBe("0264ef40c21f18f7539f1d0926663392f9e18dee56046244c24d3b4ea6780a86e8")
         expect(getAddress(pubKey0)).toBe("EUHxgBacbyGNneLyZQPwp7hoHxWvCJYQqy")
     })
