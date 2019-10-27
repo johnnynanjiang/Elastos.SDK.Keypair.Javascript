@@ -5,3 +5,5 @@ package-lock.json
 .DS_Store
 elastos-wallet-js-1.0.9.js
 elastos-wallet-js-1.0.9.min.js
+elastos-1.0.9.js
+elastos-1.0.9.min.js
